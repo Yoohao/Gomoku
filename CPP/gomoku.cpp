@@ -178,8 +178,9 @@ void Gomoku::Referee()
   {
     if((dir[i]=dir[i]+dir[i+4]) == 4)
     {
-       SetWinner(Obj);
-       break;
+      //lol
+      SetWinner(Obj);
+      break;
     }
   }
 }
