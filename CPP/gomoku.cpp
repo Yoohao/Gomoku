@@ -119,7 +119,7 @@ void Gomoku::Control()
   }
   mvprintw(7, 2*SIZE+10+9, "%c, %d", (char)cur.x+'A', cur.y);
   mvaddch(5, 2*SIZE+10+6, (char)(r_time/60+'0'));
-  mvprintw(5, 2*SIZE+10+8, "%d ", r_time%60);
+  mvprintw(5, 2*SIZE+10+8, "%c%c", (char)(r_time%60/10+'0'), (char)(r_time%60%10+'0'));
 }
 
 void Gomoku::Referee()
