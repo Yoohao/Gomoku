@@ -68,6 +68,7 @@ void Gomoku::Control()
     case 'c':
       break;
     case 10:
+    case ' ':
       if (map[cur.y][cur.x] == 'E')
       {
         remain-=1;
@@ -229,5 +230,5 @@ void Showinit(Gomoku &Game)
   mvaddstr(4, 2*SIZE+10+12, Game.GetWho()?"White":"Black");
   if(Game.GetWho()) attroff(A_REVERSE);
   mvaddch(5, 2*SIZE+10+6, (char)(TIME/60)+'0');
-  mvprintw(5, 2*SIZE+10+8, "%d", TIME%60);
+  mvprintw(5, 2*SIZE+10+8, "%d%d", TIME%60/10, TIME%60%10);
 }
