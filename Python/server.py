@@ -43,7 +43,7 @@ class Gomoku(LineReceiver):
 			queue[0].sendLine('Your enemy is: %s' %(queue[1].name))
 			queue[1].sendLine('Your enemy is: %s' %(queue[0].name))
 			queue[0].status = queue[1].status = 'Gomoku'
-			del l[:]
+			del queue[:]
 
 	def HANDLE_GOMOKU(self, str):
 		if str == 'ls':
