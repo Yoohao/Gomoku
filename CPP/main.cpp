@@ -17,14 +17,8 @@ void EnableCurses(bool yes=true)
 Gomoku Game;
 int main()
 {
-  //string check;
-  //cout<<"c? ";
-  //cin>>check;
-  //if(check == "Y" || check == "y" || check == "yes")
   Game.SetInternet(true);
   cout<<"waiting..."<<endl;
-  //sleep(1);
-  //Game.Recieve();
   cout<<"press any key to start game"<<endl;
   getchar();
 
@@ -38,11 +32,9 @@ int main()
     refresh();
     if((turn != Game.GetWho()) && Game.GetInternet())
     {
-      thread t(Timer);
       mvaddstr(12, 2*SIZE+10, "Status: waiting...");
       refresh();
       Game.RECV_DRAW();
-      t.join();
     }
     refresh();
     if(Game.GetWinner()!='E')
@@ -60,8 +52,6 @@ int main()
     pick = false;
     TO = false;
     thread t(Timer);
-    fflush(stdin);
-    //cin.ignore(256, '\n');
     while(!pick && !TO && !Exit)
       Game.Control();
     t.join();

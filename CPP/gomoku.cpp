@@ -90,19 +90,6 @@ void Gomoku::Control()
         this->Draw(cur, who);
         this->Send();
       }
-    /*
-      if (map[cur.y][cur.x] == 'E')
-      {
-        remain-=1;
-        if(who) attron(A_REVERSE);
-        mvaddch(cur.y+2, cur.x*2+3, who?WHITE:BLACK);
-        if(who) attroff(A_REVERSE);
-        mvprintw(8, 2*SIZE+10, "Remain: %d  ", remain);
-        Referee();
-        map[cur.y][cur.x]= who?WHITE:BLACK;
-        SetWho(who?TURN_B:TURN_W);
-        pick = true;
-      }*/
       break;
     case 'Q':
     case 'q':

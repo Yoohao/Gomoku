@@ -50,7 +50,7 @@ class Gomoku : public CONNECTION
 {
 private:
   char map[SIZE][SIZE], winner;
-  bool who; // false: black, true: white
+  bool who;
   bool internet;
   int remain;
   struct pos cur;
@@ -71,7 +71,6 @@ public:
     memset(buffer, 0, sizeof(buffer));
     recv(this->sock, buffer, 100, 0);
     mvprintw(14, 0, "%s", buffer);
-    //cout<<buffer<<endl;
   }
   void Send()
   {
