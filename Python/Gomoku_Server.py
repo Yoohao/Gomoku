@@ -193,22 +193,22 @@ class Gomoku(LineReceiver):
 		print info['msg']
 #
 	CmdList={
-			'cmd'		: ['/cmd - List all ommands.'							, BB, ListCmd],
-			'list'		: ['/list - List all users.'							, BB, ListUser],
+			'cmd'		: ['/cmd - List all ommands.'					, BB, ListCmd],
+			'list'		: ['/list - List all users.'					, BB, ListUser],
 			'name'		: ['/name [newname] - Rename your nickname.'			, AB, Rename],
 			'w'			: ['/w [username] [messgage] - Send whisper to an user.', AA, Whisper],
 			'all'		: ['/all [messgage] - Send messgage to all users.'		, BA, Chat],
-			'ban'		: ['/ban [username] - Ban an user.'						, AB, Ban],
-			'unban'		: ['/unban [username] - Unban an user.'					, AB, Unban],
-			'blacklist'	: ['/blacklist - List your blacklist.'					, BB, Blacklist],
+			'ban'		: ['/ban [username] - Ban an user.'				, AB, Ban],
+			'unban'		: ['/unban [username] - Unban an user.'				, AB, Unban],
+			'blacklist'	: ['/blacklist - List your blacklist.'				, BB, Blacklist],
 			'gomoku'	: ['/gomoku [msg]'										, BA, Gomoku]
 			}
 
 	CmdMap={
-			0: ['cmd', 'list', 'blacklist'], #/cmd
-			1: ['name', 'ban', 'unban'],	 #/cmd name
-			2: ['all', 'gomoku'],			 #/cmd msg
-			3: ['w']						 #/cmd name msg
+			0: ['cmd', 'list', 'blacklist'],	#/cmd
+			1: ['name', 'ban', 'unban'],		#/cmd name
+			2: ['all', 'gomoku'],			#/cmd msg
+			3: ['w'] 				#/cmd name msg
 		   }
 #
 class GomokuFactory(Factory):
