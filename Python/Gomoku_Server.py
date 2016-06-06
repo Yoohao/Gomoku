@@ -3,7 +3,9 @@ from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
 import re
+import time
 
+number = 0
 queue = []
 invalid = '[!@#$%\^&*()+=-\[\]{}\"\'?/><;:.,]'
 class Gomoku(LineReceiver):
@@ -13,11 +15,28 @@ class Gomoku(LineReceiver):
 		self.name = None
 		self.opponent = None
 		self.blacklist = []
-		self.status = 'Getname'
+		self.status = ''#'Getname'
+		global number
+		self.chess = number
+		number = number + 1
 
 	def connectionMade(self):
 		print 'Connection:', self.transport.client[0]
-		self.sendLine('What\'s your name?')
+		#self.sendLine('What\'s your name?')
+		print self.chess
+		if self.chess%2 == 0:
+			self.sendLine('\x00')
+			print self.transport.client
+		else:
+			self.sendLine('\x01')
+			print self.transport.client
+		queue.append(self)
+		if len(queue) == 2:
+			queue[0].op = queue[1]
+			queue[1].op = queue[0]
+			print 'done'
+			del queue[0:]
+
 
 	def connectionLost(self, reason):
 		if self.users.has_key(self.name):
@@ -26,7 +45,7 @@ class Gomoku(LineReceiver):
 	def lineReceived(self, line):
 		if line == '':
 			return
-		print self.name, self.status,'(%s) send:' %(self.transport.client[0]), line
+		print self.chess, self.name, self.status,'(%s) send:' %(self.transport.client[0]), line
 		if self.status == 'Getname':
 			self.HANDLE_NAME(line)
 		else:
@@ -48,7 +67,7 @@ class Gomoku(LineReceiver):
 		self.users[name] = self
 		self.blacklist = []
 		self.status = 'Named'
-		self.BroadCast('\''+name+'\' just login!')
+		#self.BroadCast('\''+name+'\' just login!')
 
 	def HANDLE_CMD(self, str):
 		info={
@@ -58,8 +77,8 @@ class Gomoku(LineReceiver):
 				'error'	: None,
 				'found'	: False,
 			 }
-
-		info['cmd'] = str.split(' ')[0].replace('/', '').lower()
+		info['cmd'] = ''
+		info['cmd'] = str.split(' ')[0].replace('/', '').lower().replace('\x00', '')
 		for key, list in self.CmdMap.iteritems():
 			if info['cmd'] in list:
 				info['found'] = True
@@ -168,6 +187,10 @@ class Gomoku(LineReceiver):
 		for item in sorted(list):
 			self.sendLine(item)
 		self.sendLine('<End>')
+
+	def Gomoku (self, info):
+		self.op.sendLine(info['msg'])
+		print info['msg']
 #
 	CmdList={
 			'cmd'		: ['/cmd - List all ommands.'							, BB, ListCmd],
@@ -177,7 +200,8 @@ class Gomoku(LineReceiver):
 			'all'		: ['/all [messgage] - Send messgage to all users.'		, BA, Chat],
 			'ban'		: ['/ban [username] - Ban an user.'						, AB, Ban],
 			'unban'		: ['/unban [username] - Unban an user.'					, AB, Unban],
-			'blacklist'	: ['/blacklist - List your blacklist.'					, BB, Blacklist]
+			'blacklist'	: ['/blacklist - List your blacklist.'					, BB, Blacklist],
+			'gomoku'	: ['/gomoku [msg]'										, BA, Gomoku]
 			}
 
 	CmdMap={
@@ -196,6 +220,6 @@ class GomokuFactory(Factory):
 		return Gomoku(self.users)
 
 port = 6666
-IP = ''
+IP = '127.0.0.1'
 reactor.listenTCP(port, GomokuFactory(), 10, IP)
 reactor.run()

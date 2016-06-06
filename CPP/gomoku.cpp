@@ -1,19 +1,17 @@
 #include "gomoku.h"
 #include <ctime>
-#include <iostream>
-#include <ncurses.h>
-#include <mutex>
+#define IP "127.0.0.1"
+#define PORT "6666"
 using namespace std;
 
 /*---------class Gomoku---------*/
 Gomoku::Gomoku ()
 {
-
   for(int i = 0; i < 10; i++)
     for(int j = 0; j < 10; j++)
         map[i][j] = 'E';
   cur.x = cur.y = 0;
-  who = pick = Exit = false;
+  who = pick = Exit = internet = false;
   winner = 'E';
   remain = 100;
 }
@@ -27,9 +25,27 @@ bool Gomoku::GetWho(){return this->who;}
 
 char Gomoku::GetWinner(){return this->winner;}
 
+bool Gomoku::GetInternet(){return this->internet;}
+
 void Gomoku::SetWho(bool b){this->who = b;}
 
 void Gomoku::SetWinner(char c){this->winner = c;}
+
+void Gomoku::SetInternet(bool yes)
+{
+  this->internet = yes;
+  if(yes)
+  {
+    ConnectTCP();
+    Recieve();
+    if(buffer[0] == 0x00)
+      who = false;
+    else if (buffer[0] == 0x01)
+      who = true;
+  }
+  else
+    return;
+}
 
 void Gomoku::Control()
 {
@@ -71,6 +87,12 @@ void Gomoku::Control()
     case ' ':
       if (map[cur.y][cur.x] == 'E')
       {
+        this->Draw(cur, who);
+        this->Send();
+      }
+    /*
+      if (map[cur.y][cur.x] == 'E')
+      {
         remain-=1;
         if(who) attron(A_REVERSE);
         mvaddch(cur.y+2, cur.x*2+3, who?WHITE:BLACK);
@@ -80,10 +102,10 @@ void Gomoku::Control()
         map[cur.y][cur.x]= who?WHITE:BLACK;
         SetWho(who?TURN_B:TURN_W);
         pick = true;
-
-      }
+      }*/
       break;
-    case 27:
+    case 'Q':
+    case 'q':
       mvaddstr(SIZE+5, 0, "Exit?(Y/N) ");
       move(SIZE+5, 11);
       refresh();
@@ -118,60 +140,61 @@ void Gomoku::Control()
     default:
       break;
   }
-  mvprintw(7, 2*SIZE+10+9, "%c, %d", (char)cur.x+'A', cur.y);
+  mvprintw(7, 2*SIZE+10+9, "%c, %d", (char)cur.x+'0', cur.y);
   mvaddch(5, 2*SIZE+10+6, (char)(r_time/60+'0'));
   mvprintw(5, 2*SIZE+10+8, "%c%c", (char)(r_time%60/10+'0'), (char)(r_time%60%10+'0'));
 }
 
-void Gomoku::Referee()
+void Gomoku::Referee(struct pos CUR)
 {
   int dir[8] = {0};
-  char Obj = who?WHITE:BLACK;
+  //mvprintw(14, 0, "%d", turn?1:0);
+  char Obj = turn?WHITE:BLACK;
   for(int i=1; i<5; i++)
   {
-    if(cur.y-i>=0 && map[cur.y-i][cur.x]==Obj)
+    if(CUR.y-i>=0 && map[CUR.y-i][CUR.x]==Obj)
       dir[0]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.x+i<10 && map[cur.y][cur.x+i]==Obj)
+    if(CUR.x+i<10 && map[CUR.y][CUR.x+i]==Obj)
       dir[2]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.y+i<10 && map[cur.y+i][cur.x]==Obj)
+    if(CUR.y+i<10 && map[CUR.y+i][CUR.x]==Obj)
       dir[4]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.x-i>=0 && map[cur.y][cur.x-i]==Obj)
+    if(CUR.x-i>=0 && map[CUR.y][CUR.x-i]==Obj)
       dir[6]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.x+i<10 && cur.y-i>=0 && map[cur.y-i][cur.x+i]==Obj)
+    if(CUR.x+i<10 && CUR.y-i>=0 && map[CUR.y-i][CUR.x+i]==Obj)
       dir[1]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.x+i<10 && cur.y+i<10 && map[cur.y+i][cur.x+i]==Obj)
+    if(CUR.x+i<10 && CUR.y+i<10 && map[CUR.y+i][CUR.x+i]==Obj)
       dir[3]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.x-i>=0 && cur.y+i<10 && map[cur.y+i][cur.x-i]==Obj)
+    if(CUR.x-i>=0 && CUR.y+i<10 && map[CUR.y+i][CUR.x-i]==Obj)
       dir[5]++;
     else break;
   }
   for(int i=1; i<5; i++)
   {
-    if(cur.x-i>=0 && cur.y-i>=0 && map[cur.y-i][cur.x-i]==Obj)
+    if(CUR.x-i>=0 && CUR.y-i>=0 && map[CUR.y-i][CUR.x-i]==Obj)
       dir[7]++;
     else break;
   }
@@ -185,9 +208,68 @@ void Gomoku::Referee()
   }
 }
 
+void Gomoku::Draw(struct pos POS, bool WHO)
+{
+    this->remain-=1;
+    if(WHO) attron(A_REVERSE);
+    mvaddch(POS.y+2, POS.x*2+3, WHO?WHITE:BLACK);
+    if(WHO) attroff(A_REVERSE);
+    mvprintw(8, 2*SIZE+10, "Remain: %d  ", this->remain);
+    map[POS.y][POS.x]= WHO?WHITE:BLACK;
+    Referee(POS);
+    turn = !turn;
+    pick = true;
+}
 
+/*---------class CONNECTION---------*/
+CONNECTION::CONNECTION()
+{
+  conn = false;
+  memset(&server, 0, sizeof(server));
+}
+
+CONNECTION::~CONNECTION()
+{
+  close(sock);
+}
+
+void CONNECTION::ConnectTCP()
+{
+  struct addrinfo *info, *p;
+  server.ai_family = AF_UNSPEC;
+  server.ai_socktype = SOCK_STREAM;
+  getaddrinfo(IP, PORT, &server, &info);
+  for (p = info; p!=NULL; p=p->ai_next)
+  {
+    if((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+      continue;
+    if(connect(sock, p->ai_addr, p->ai_addrlen) == -1)
+    {
+       close(sock);
+       continue;
+    }
+    conn = true;
+    printf("connect!!\n");
+    break;
+  }
+  if(p==NULL)
+    printf("NO!\n");
+  freeaddrinfo(info);
+  int yes=1;
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+}
+
+int CONNECTION::GetSock()
+{
+  return this->sock;
+}
+
+bool CONNECTION::GetConnection()
+{
+  return this->conn;
+}
 /*---------function---------*/
-void DrawBoard()
+void DrawBoard(bool who)
 {
   for(int i=0; i<SIZE; i++)
   {
@@ -201,8 +283,12 @@ void DrawBoard()
   for(int i = 0; i < SIZE; i++)
     for(int j = 0; j < SIZE; j++)
       mvaddch(i+2, 2*j+3, BOARD);
+  mvaddstr(3, 2*SIZE+10, "You are: ");
+  if(who) attron(A_REVERSE);
+  mvprintw(3, 2*SIZE+10+9, "%s", who?"White":"Black");
+  if(who) attroff(A_REVERSE);
   mvaddstr(4, 2*SIZE+10, "Now Return:");
-  mvaddstr(5, 2*SIZE+10, "Time:  :");
+  mvaddstr(5, 2*SIZE+10, "Time: 5:00");
   mvaddstr(7, 2*SIZE+10, "Now pos: A, 0");
   mvprintw(8, 2*SIZE+10, "Remain: %d", SIZE*SIZE);
   mvaddstr(10, 2*SIZE+10, "Winner: None");
@@ -226,9 +312,9 @@ void Timer ()
 
 void Showinit(Gomoku &Game)
 {
-  if(Game.GetWho()) attron(A_REVERSE);
-  mvaddstr(4, 2*SIZE+10+12, Game.GetWho()?"White":"Black");
-  if(Game.GetWho()) attroff(A_REVERSE);
+  if(turn) attron(A_REVERSE);
+  mvaddstr(4, 2*SIZE+10+12, turn?"White":"Black");
+  if(turn) attroff(A_REVERSE);
   mvaddch(5, 2*SIZE+10+6, (char)(TIME/60)+'0');
   mvprintw(5, 2*SIZE+10+8, "%d%d", TIME%60/10, TIME%60%10);
 }

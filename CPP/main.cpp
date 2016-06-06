@@ -1,25 +1,67 @@
-#include <ncurses.h>
 #include <thread>
 #include "gomoku.cpp"
 #define SIZE 10
 
-Gomoku Game;
+void EnableCurses(bool yes=true)
+{
+  if(yes)
+  {
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, true);
+    nodelay(stdscr, true);
+  }
+}
 
+Gomoku Game;
 int main()
 {
-  initscr();
-  cbreak();
-  noecho();
-  keypad(stdscr, true);
-  DrawBoard();
+  //string check;
+  //cout<<"c? ";
+  //cin>>check;
+  //if(check == "Y" || check == "y" || check == "yes")
+  Game.SetInternet(true);
+  cout<<"waiting..."<<endl;
+  //sleep(1);
+  //Game.Recieve();
+  cout<<"press any key to start game"<<endl;
+  getchar();
+
+  EnableCurses();
+  DrawBoard(Game.GetWho());
   refresh();
+  turn = false;
   while(1)
   {
+    Showinit(Game);
+    refresh();
+    if((turn != Game.GetWho()) && Game.GetInternet())
+    {
+      thread t(Timer);
+      mvaddstr(12, 2*SIZE+10, "Status: waiting...");
+      refresh();
+      Game.RECV_DRAW();
+      t.join();
+    }
+    refresh();
+    if(Game.GetWinner()!='E')
+    {
+      if(Game.GetWinner() == WHITE) attron(A_REVERSE);
+      mvaddstr(10, 2*SIZE+10+8, Game.GetWinner()==WHITE?"White":"Black");
+      if(Game.GetWinner() == WHITE) attroff(A_REVERSE);
+      nodelay(stdscr, false);
+      getch();
+      break;
+    }
+    mvaddstr(12, 2*SIZE+10, "Status: thinking..");
     Showinit(Game);
     refresh();
     pick = false;
     TO = false;
     thread t(Timer);
+    fflush(stdin);
+    //cin.ignore(256, '\n');
     while(!pick && !TO && !Exit)
       Game.Control();
     t.join();
@@ -33,15 +75,18 @@ int main()
       if(Game.GetWinner() == WHITE) attron(A_REVERSE);
       mvaddstr(10, 2*SIZE+10+8, Game.GetWinner()==WHITE?"White":"Black");
       if(Game.GetWinner() == WHITE) attroff(A_REVERSE);
+      nodelay(stdscr, false);
       getch();
       break;
     }
-    flash();
+
+    //flash();
   }
   erase();
   mvaddstr(0, 0, "Good bye!");
   refresh();
   getch();
   endwin();
+
   return 0;
 }
