@@ -16,6 +16,17 @@ Gomoku::Gomoku ()
   remain = 100;
 }
 
+void Gomoku::RECV_DRAW()
+{
+  memset(buffer, 0, sizeof(buffer));
+  refresh();
+  this->Recieve();
+  struct pos tmp;
+  tmp.x = (int)buffer[0]-'0';
+  tmp.y = (int)buffer[1]-'0';
+  Draw(tmp, !this->who);
+}
+
 void Gomoku::GotoXY()
 {
   move(cur.y+2, cur.x*2+3);

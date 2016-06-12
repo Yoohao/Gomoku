@@ -1,15 +1,14 @@
+#include <iostream>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <netdb.h>
 #include <sys/types.h>
-
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <ncurses.h>
-#include <iostream>
 
 #define SIZE 10
 #define TIME 300
@@ -55,17 +54,6 @@ private:
   int remain;
   struct pos cur;
 public:
-  void show(){cout<<buffer<<endl;}
-  void RECV_DRAW()
-  {
-    memset(buffer, 0, sizeof(buffer));
-    refresh();
-    this->Recieve();
-    struct pos tmp;
-    tmp.x = (int)buffer[0]-'0';
-    tmp.y = (int)buffer[1]-'0';
-    Draw(tmp, !this->who);
-  }
   void Recieve()
   {
     memset(buffer, 0, sizeof(buffer));
@@ -81,6 +69,7 @@ public:
       return;
   }
   Gomoku();
+  void RECV_DRAW();
   void GotoXY();
   bool GetWho();
   char GetWinner();
