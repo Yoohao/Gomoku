@@ -23,18 +23,17 @@ class Gomoku(LineReceiver):
 	def connectionMade(self):
 		print 'Connection:', self.transport.client[0]
 		#self.sendLine('What\'s your name?')
-		print self.chess
 		if self.chess%2 == 0:
 			self.sendLine('\x00')
-			print self.transport.client
 		else:
 			self.sendLine('\x01')
-			print self.transport.client
+		print self.chess, self.transport.client
 		queue.append(self)
 		if len(queue) == 2:
 			queue[0].op = queue[1]
 			queue[1].op = queue[0]
-			print 'done'
+			#print self.sendLine('s')
+			#print self.op.sendLine('s')
 			del queue[0:]
 
 
@@ -220,6 +219,6 @@ class GomokuFactory(Factory):
 		return Gomoku(self.users)
 
 port = 6666
-IP = '127.0.0.1'
+IP = '192.168.1.108'
 reactor.listenTCP(port, GomokuFactory(), 10, IP)
 reactor.run()

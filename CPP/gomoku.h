@@ -58,7 +58,6 @@ public:
   {
     memset(buffer, 0, sizeof(buffer));
     recv(this->sock, buffer, 100, 0);
-    mvprintw(14, 0, "%s", buffer);
   }
   void Send()
   {

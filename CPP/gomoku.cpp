@@ -1,6 +1,6 @@
 #include "gomoku.h"
 #include <ctime>
-#define IP "127.0.0.1"
+#define IP "192.168.1.108"
 #define PORT "6666"
 using namespace std;
 
@@ -18,8 +18,6 @@ Gomoku::Gomoku ()
 
 void Gomoku::RECV_DRAW()
 {
-  memset(buffer, 0, sizeof(buffer));
-  refresh();
   this->Recieve();
   struct pos tmp;
   tmp.x = (int)buffer[0]-'0';
@@ -48,7 +46,7 @@ void Gomoku::SetInternet(bool yes)
   if(yes)
   {
     ConnectTCP();
-    Recieve();
+    this->Recieve();
     if(buffer[0] == 0x00)
       who = false;
     else if (buffer[0] == 0x01)
@@ -285,7 +283,7 @@ void DrawBoard(bool who)
   if(who) attron(A_REVERSE);
   mvprintw(3, 2*SIZE+10+9, "%s", who?"White":"Black");
   if(who) attroff(A_REVERSE);
-  mvaddstr(4, 2*SIZE+10, "Now Return:");
+  mvaddstr(4, 2*SIZE+10, "Now turn to:");
   mvaddstr(5, 2*SIZE+10, "Time: 5:00");
   mvaddstr(7, 2*SIZE+10, "Now pos: A, 0");
   mvprintw(8, 2*SIZE+10, "Remain: %d", SIZE*SIZE);

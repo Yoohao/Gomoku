@@ -18,18 +18,19 @@ Gomoku Game;
 int main()
 {
   Game.SetInternet(true);
-  cout<<"waiting..."<<endl;
   cout<<"press any key to start game"<<endl;
   getchar();
-
+  cout<<"waiting..."<<endl;
   EnableCurses();
   DrawBoard(Game.GetWho());
   refresh();
   turn = false;
+  Game.Recieve();
   while(1)
   {
     Showinit(Game);
     refresh();
+    //thread ti(Timer);
     if((turn != Game.GetWho()) && Game.GetInternet())
     {
       mvaddstr(12, 2*SIZE+10, "Status: waiting...");
@@ -46,6 +47,7 @@ int main()
       getch();
       break;
     }
+    //ti.join();
     mvaddstr(12, 2*SIZE+10, "Status: thinking..");
     Showinit(Game);
     refresh();
