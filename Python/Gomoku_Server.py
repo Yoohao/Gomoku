@@ -22,7 +22,6 @@ class Gomoku(LineReceiver):
 
 	def connectionMade(self):
 		print 'Connection:', self.transport.client[0]
-		#self.sendLine('What\'s your name?')
 		if self.chess%2 == 0:
 			self.sendLine('\x00')
 		else:
@@ -32,8 +31,6 @@ class Gomoku(LineReceiver):
 		if len(queue) == 2:
 			queue[0].op = queue[1]
 			queue[1].op = queue[0]
-			#print self.sendLine('s')
-			#print self.op.sendLine('s')
 			del queue[0:]
 
 
@@ -189,7 +186,6 @@ class Gomoku(LineReceiver):
 
 	def Gomoku (self, info):
 		self.op.sendLine(info['msg'])
-		print info['msg']
 #
 	CmdList={
 			'cmd'		: ['/cmd - List all ommands.'					, BB, ListCmd],

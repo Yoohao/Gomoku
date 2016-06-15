@@ -1,0 +1,10 @@
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\bin\Debug\Gomoku.exe.config
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\bin\Debug\Gomoku.exe
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\bin\Debug\Gomoku.pdb
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.csprojResolveAssemblyReference.cache
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.Form1.resources
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.Properties.Resources.resources
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.Resource1.resources
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.csproj.GenerateResource.Cache
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.exe
+c:\users\yo\documents\visual studio 2015\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.pdb
