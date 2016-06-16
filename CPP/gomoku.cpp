@@ -1,6 +1,6 @@
 #include "gomoku.h"
 #include <ctime>
-#define IP "192.168.1.108"
+#define IP "10.201.16.197"
 #define PORT "6666"
 using namespace std;
 

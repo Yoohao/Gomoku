@@ -215,6 +215,6 @@ class GomokuFactory(Factory):
 		return Gomoku(self.users)
 
 port = 6666
-IP = '192.168.1.108'
+IP = '10.201.16.197'
 reactor.listenTCP(port, GomokuFactory(), 10, IP)
 reactor.run()

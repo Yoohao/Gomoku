@@ -25,7 +25,7 @@ int main()
   DrawBoard(Game.GetWho());
   refresh();
   turn = false;
-  Game.Recieve();
+  //Game.Recieve();
   while(1)
   {
     Showinit(Game);
